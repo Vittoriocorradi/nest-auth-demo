@@ -4,6 +4,6 @@
 
 - create .env file
 
-- npm prisma generate
+- npx prisma generate
 
 - npm run start:dev
