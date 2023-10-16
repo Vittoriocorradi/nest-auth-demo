@@ -65,8 +65,17 @@ In **auth.service.ts** creare i seguenti metodi:
 
   - **register** per registrare un nuovo utente. Passare dalla richiesta alla funzione un username e una password. Controllare se l'utente esista già. Se l'utente non è già registrato, salvaro sul database.
 
+    Installare i pacchetti per l'hash della password
+
+      - `npm i bcrypt`
+      - `npm i -D @types/bcrypt`
+
+      Usare **bcrypt** per hashare la password prima di inserirla nel database
+
   - **signIn** per effettuare il login. Passare dalla richesta alla funzione un username e una password. Se l'utente non esiste o la password è incorretta, lanciare un errore.  
   Se l'utente esiste, generare e salvare sul database un refresh token per l'utente che ha appena effettuato il login.
+
+    Usare **bcrypt** per comparare la password nella richiesta con la password hashata nel database.
 
   - **checkRefreshToken** per controllare se il token sia scaduto e nel caso controllare se il refresh token nella richiesta combaci con quello salvato sul database: se combacia, inviare un nuovo token. 
 

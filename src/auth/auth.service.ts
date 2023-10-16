@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from 'src/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -22,10 +23,14 @@ export class AuthService {
             throw new UnauthorizedException('Utente già registrato');
         }
 
+        // Generare un salt e hashare la password prima di inserirla nel database
+        const saltOrRounds = await bcrypt.genSalt();
+        const hash = await bcrypt.hash(password, saltOrRounds);
+
         const user = await this.prisma.user.create({
             data: {
                 username,
-                password
+                password: hash,
             }
         });
 
@@ -39,9 +44,15 @@ export class AuthService {
         if (!user) {
             throw new UnauthorizedException('User not found');
         }
-        if (user?.password !== pass) {
+
+        // Comparare la password ricevuto con la password hashata nel database usando bcrypt.compare(password ricevuta, password nel db)
+        const isMatch = await bcrypt.compare(pass, user?.password);
+        
+        // Se le password non combaciano, lancia un errore
+        if (!isMatch) {
             throw new UnauthorizedException();
-        };
+        }
+
         const payload = { sub: user.id, username: user.username }
 
         const crypto = require('crypto');
